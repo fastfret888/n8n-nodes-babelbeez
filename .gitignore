@@ -71,3 +71,4 @@ temp/
 
 # Package manager misc
 .npmrc
+*.tgz
