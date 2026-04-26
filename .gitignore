@@ -1,0 +1,73 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+.yarn/
+
+# Build outputs
+/dist/
+/build/
+/coverage/
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime/local config
+.env
+.env.*
+!.env.example
+*.local
+
+# Secrets / credentials / keys
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+*.jks
+*.keystore
+id_rsa*
+id_dsa*
+*.secret
+*.secrets
+*.secret.*
+*.secrets.*
+secrets/
+.secret/
+.local-secrets/
+test-secrets/
+test-credentials/
+*.credentials.local.*
+*.token
+*.tokens
+
+# n8n local runtime data
+.n8n/
+n8n_data/
+.n8n-custom/
+workflows.local/
+credentials.local/
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.example.json
+.idea/
+
+# Temp/cache
+.tmp/
+tmp/
+temp/
+.cache/
+.npm/
+
+# Package manager misc
+.npmrc
