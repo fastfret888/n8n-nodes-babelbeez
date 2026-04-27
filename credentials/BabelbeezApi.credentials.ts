@@ -12,7 +12,7 @@ export class BabelbeezApi implements ICredentialType {
 
 	displayName = 'Babelbeez API';
 
-	icon = 'file:../nodes/Babelbeez/babelbeez-logo-60x60.png' as const;
+	icon = 'file:../nodes/BabelbeezTrigger/babelbeez-logo-60x60.png' as const;
 
 	documentationUrl = 'https://github.com/fastfret888/n8n-nodes-babelbeez#credentials';
 
