@@ -14,10 +14,7 @@ import type { BabelbeezCredentials } from './types';
 type BabelbeezApiContext = IExecuteFunctions | IHookFunctions | ILoadOptionsFunctions | IWebhookFunctions;
 
 export const BABELBEEZ_CREDENTIAL_TYPE = 'babelbeezApi';
-
-export function normalizeBaseUrl(baseUrl: string): string {
-	return baseUrl.replace(/\/+$/, '');
-}
+export const BABELBEEZ_API_BASE_URL = 'https://api.babelbeez.com';
 
 export async function getBabelbeezCredentials(
 	context: BabelbeezApiContext,
@@ -26,7 +23,6 @@ export async function getBabelbeezCredentials(
 
 	return {
 		apiKey: credentials.apiKey,
-		baseUrl: normalizeBaseUrl(credentials.baseUrl),
 	};
 }
 
@@ -36,12 +32,11 @@ export async function babelbeezApiRequest<T>(
 	endpoint: string,
 	options: Partial<IHttpRequestOptions> = {},
 ): Promise<T> {
-	const credentials = await getBabelbeezCredentials(context);
 	const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
 
 	const requestOptions: IHttpRequestOptions = {
 		method,
-		url: `${credentials.baseUrl}${normalizedEndpoint}`,
+		url: `${BABELBEEZ_API_BASE_URL}${normalizedEndpoint}`,
 		json: true,
 		...options,
 		headers: {

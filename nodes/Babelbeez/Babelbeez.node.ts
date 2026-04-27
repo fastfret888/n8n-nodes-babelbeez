@@ -1,21 +1,14 @@
 import type {
-	IDataObject,
-	IExecuteFunctions,
 	ILoadOptionsFunctions,
-	INodeExecutionData,
 	INodeListSearchResult,
 	INodePropertyOptions,
 	INodeType,
 	INodeTypeDescription,
 } from 'n8n-workflow';
-import { NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
+import { NodeConnectionTypes } from 'n8n-workflow';
 
-import { babelbeezApiRequest, BABELBEEZ_CREDENTIAL_TYPE } from '../shared/api';
-import type {
-	CallCompletedWebhookEvent,
-	N8nChatbotListResponse,
-	N8nSchemaResponse,
-} from '../shared/types';
+import { babelbeezApiRequest, BABELBEEZ_API_BASE_URL, BABELBEEZ_CREDENTIAL_TYPE } from '../shared/api';
+import type { N8nChatbotListResponse } from '../shared/types';
 
 export class Babelbeez implements INodeType {
 	description: INodeTypeDescription = {
@@ -39,6 +32,13 @@ export class Babelbeez implements INodeType {
 				required: true,
 			},
 		],
+		requestDefaults: {
+			baseURL: BABELBEEZ_API_BASE_URL,
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+			},
+		},
 		properties: [
 			{
 				displayName: 'Resource',
@@ -69,18 +69,49 @@ export class Babelbeez implements INodeType {
 						value: 'getSchema',
 						action: 'Get voice agent schema',
 						description: 'Retrieve monitored entity fields for a voice agent',
+						routing: {
+							request: {
+								method: 'GET',
+								url: '=/api/v1/integrations/n8n/chatbots/{{$parameter.publicChatbotId.value}}/schema',
+							},
+						},
 					},
 					{
 						name: 'Get Test Event',
 						value: 'getTestEvent',
 						action: 'Get voice agent test event',
 						description: 'Retrieve a sample call-completed event for a voice agent',
+						routing: {
+							request: {
+								method: 'GET',
+								url: '/api/v1/integrations/n8n/test',
+								qs: {
+									public_chatbot_id: '={{$parameter.publicChatbotId.value}}',
+								},
+							},
+						},
 					},
 					{
 						name: 'List',
 						value: 'list',
 						action: 'List voice agents',
 						description: 'List voice agents available to this Babelbeez account',
+						routing: {
+							request: {
+								method: 'GET',
+								url: '/api/v1/integrations/n8n/chatbots',
+							},
+							output: {
+								postReceive: [
+									{
+										type: 'rootProperty',
+										properties: {
+											property: 'chatbots',
+										},
+									},
+								],
+							},
+						},
 					},
 				],
 				default: 'list',
@@ -147,77 +178,4 @@ export class Babelbeez implements INodeType {
 			},
 		},
 	};
-
-	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
-		const items = this.getInputData();
-		const operation = this.getNodeParameter('operation', 0) as string;
-		const returnData: INodeExecutionData[] = [];
-
-		if (operation === 'list') {
-			const response = await babelbeezApiRequest<N8nChatbotListResponse>(
-				this,
-				'GET',
-				'/api/v1/integrations/n8n/chatbots',
-			);
-
-			return [this.helpers.returnJsonArray(response.chatbots as unknown as IDataObject[])];
-		}
-
-		for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
-			try {
-				const publicChatbotId = this.getNodeParameter(
-					'publicChatbotId.value',
-					itemIndex,
-					'',
-				) as string;
-
-				if (!publicChatbotId) {
-					throw new NodeOperationError(this.getNode(), 'Select a voice agent', {
-						description: "Choose a voice agent in 'Voice Agent Name or ID' before running this operation.",
-						itemIndex,
-					});
-				}
-
-				let response: N8nSchemaResponse | CallCompletedWebhookEvent;
-				if (operation === 'getSchema') {
-					response = await babelbeezApiRequest<N8nSchemaResponse>(
-						this,
-						'GET',
-						`/api/v1/integrations/n8n/chatbots/${encodeURIComponent(publicChatbotId)}/schema`,
-					);
-				} else if (operation === 'getTestEvent') {
-					response = await babelbeezApiRequest<CallCompletedWebhookEvent>(
-						this,
-						'GET',
-						'/api/v1/integrations/n8n/test',
-						{
-							qs: { public_chatbot_id: publicChatbotId },
-						},
-					);
-				} else {
-					throw new NodeOperationError(this.getNode(), `Unsupported operation '${operation}'`, {
-						itemIndex,
-					});
-				}
-
-				const executionData = this.helpers.constructExecutionMetaData(
-					this.helpers.returnJsonArray(response as unknown as IDataObject),
-					{ itemData: { item: itemIndex } },
-				);
-				returnData.push(...executionData);
-			} catch (error) {
-				if (this.continueOnFail()) {
-					returnData.push({
-						json: { error: error instanceof Error ? error.message : String(error) },
-						pairedItem: { item: itemIndex },
-					});
-					continue;
-				}
-
-				throw error;
-			}
-		}
-
-		return [returnData];
-	}
 }

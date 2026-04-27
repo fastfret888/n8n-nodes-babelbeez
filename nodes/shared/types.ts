@@ -1,6 +1,5 @@
 export interface BabelbeezCredentials {
 	apiKey: string;
-	baseUrl: string;
 }
 
 export interface N8nChatbotInfo {

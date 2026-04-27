@@ -5,6 +5,8 @@ import type {
 	INodeProperties,
 } from 'n8n-workflow';
 
+import { BABELBEEZ_API_BASE_URL } from '../nodes/shared/api';
+
 export class BabelbeezApi implements ICredentialType {
 	name = 'babelbeezApi';
 
@@ -24,14 +26,6 @@ export class BabelbeezApi implements ICredentialType {
 			default: '',
 			description: 'Babelbeez embed/API key used to authenticate native n8n requests',
 		},
-		{
-			displayName: 'Base URL',
-			name: 'baseUrl',
-			type: 'string',
-			required: true,
-			default: 'https://api.babelbeez.com',
-			description: 'The Babelbeez API base URL. Change this only for local or staging testing.',
-		},
 	];
 
 	authenticate: IAuthenticateGeneric = {
@@ -45,7 +39,8 @@ export class BabelbeezApi implements ICredentialType {
 
 	test: ICredentialTestRequest = {
 		request: {
-			baseURL: '={{$credentials.baseUrl.replace(/\\/$/, "")}}',
+			baseURL: BABELBEEZ_API_BASE_URL,
+			method: 'GET',
 			url: '/api/v1/integrations/n8n/me',
 		},
 	};

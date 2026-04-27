@@ -36,7 +36,6 @@ npm run dev
 Create a **Babelbeez API** credential in n8n with:
 
 - **API Key**: your Babelbeez API/embed key from the Babelbeez dashboard.
-- **Base URL**: defaults to `https://api.babelbeez.com`. Change this only when testing against a local or staging Babelbeez API.
 
 The credential test calls `GET /api/v1/integrations/n8n/me` and sends the key in the `X-API-Key` header.
 

@@ -24,6 +24,7 @@ import type {
 
 const WEBHOOK_NAME = 'default';
 const SIGNATURE_PREFIX = 'v1=';
+const MAX_SIGNATURE_AGE_SECONDS = 5 * 60;
 
 function getHeaderValue(headers: Record<string, string | string[] | undefined>, name: string): string {
 	const value = headers[name.toLowerCase()];
@@ -32,6 +33,16 @@ function getHeaderValue(headers: Record<string, string | string[] | undefined>, 
 
 function verifySignature(rawBody: Buffer, timestamp: string, signatureHeader: string, secret: string): boolean {
 	if (!timestamp || !signatureHeader.startsWith(SIGNATURE_PREFIX) || !secret) {
+		return false;
+	}
+
+	const timestampMs = Date.parse(timestamp);
+	if (!Number.isFinite(timestampMs)) {
+		return false;
+	}
+
+	const ageSeconds = Math.abs(Date.now() - timestampMs) / 1000;
+	if (ageSeconds > MAX_SIGNATURE_AGE_SECONDS) {
 		return false;
 	}
 
