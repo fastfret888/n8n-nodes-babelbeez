@@ -2,7 +2,7 @@
 
 n8n community nodes for Babelbeez voice agent automation.
 
-Babelbeez helps teams create and embed OpenAI-powered real-time voice agents on their websites. This package will provide native n8n nodes for connecting Babelbeez voice agent events and metadata to n8n workflows.
+Babelbeez helps teams create and embed OpenAI-powered real-time voice agents on their websites. This package provides a native n8n trigger for connecting Babelbeez completed-call events to n8n workflows.
 
 > This repository is public. Do not commit `.env` files, real API keys, webhook signing secrets, n8n credential exports, customer data, or locally generated workflow credentials.
 
@@ -26,10 +26,9 @@ npm run build
 npm run dev
 ```
 
-## Planned Nodes
+## Node
 
 - **Babelbeez Trigger**: receive signed `call_completed` webhook events from Babelbeez.
-- **Babelbeez**: action node for listing voice agents, fetching monitored-entity schema, and retrieving test events.
 
 ## Credentials
 
@@ -48,21 +47,15 @@ Setup:
 1. Add the **Babelbeez Trigger** node to a workflow.
 2. Select your **Babelbeez API** credential.
 3. Choose a **Voice Agent Name or ID**.
-4. Activate the workflow.
+4. To test the trigger, click **Execute Step** in n8n, then complete a test call in the Babelbeez preview for the selected voice agent.
+5. Use the received completed-call payload to configure downstream workflow nodes.
+6. Activate the workflow when you are ready to receive production completed-call events.
 
-On activation, the node registers the n8n webhook URL with Babelbeez through `POST /api/v1/integrations/n8n/subscribe`. On deactivation, it unsubscribes through `POST /api/v1/integrations/n8n/unsubscribe`.
+During **Execute Step**, n8n creates a temporary test webhook URL. The trigger registers that URL with Babelbeez through `POST /api/v1/integrations/n8n/subscribe`, so the next completed call for the selected voice agent can appear directly in the n8n editor.
+
+On workflow activation, the trigger registers the production n8n webhook URL with Babelbeez. On workflow deactivation, it unsubscribes through `POST /api/v1/integrations/n8n/unsubscribe`.
 
 The node emits one item for each verified `call_completed` payload.
-
-## Babelbeez Action Node
-
-Use **Babelbeez** for setup, testing, and mapping support.
-
-Available operations:
-
-- **List**: list voice agents available to the credential.
-- **Get Schema**: fetch the canonical `call_completed` fields plus monitored-entity `data` fields for a selected voice agent.
-- **Get Test Event**: fetch a synthetic `call_completed` payload for workflow testing and mapping.
 
 ## Webhook Signature Verification
 

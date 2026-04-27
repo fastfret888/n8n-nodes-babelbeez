@@ -100,8 +100,9 @@ export class BabelbeezTrigger implements INodeType {
 				path: 'babelbeez-call-completed',
 			},
 		],
-		eventTriggerDescription: 'Waiting for a Babelbeez call-completed event',
-		activationMessage: 'Babelbeez will now send completed call events to this workflow.',
+		eventTriggerDescription:
+			'Waiting for a Babelbeez completed-call event. To test, complete a call in the Babelbeez preview for the selected voice agent.',
+		activationMessage: 'Babelbeez will now send completed-call events to this workflow.',
 		properties: [
 			{
 				displayName: 'Voice Agent Name or ID',
@@ -109,7 +110,8 @@ export class BabelbeezTrigger implements INodeType {
 				type: 'resourceLocator',
 				default: { mode: 'list', value: '' },
 				required: true,
-				description: 'Choose a voice agent from the list, or specify its public ID using an expression',
+				description:
+					'Choose the voice agent whose completed calls should trigger this workflow. For test executions, click Execute Step and complete a call in the Babelbeez preview for this agent.',
 				modes: [
 					{
 						displayName: 'From List',

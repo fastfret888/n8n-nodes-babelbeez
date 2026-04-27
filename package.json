@@ -34,7 +34,6 @@
       "dist/credentials/BabelbeezApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/Babelbeez/Babelbeez.node.js",
       "dist/nodes/BabelbeezTrigger/BabelbeezTrigger.node.js"
     ]
   },
